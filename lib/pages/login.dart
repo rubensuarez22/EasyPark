@@ -22,6 +22,8 @@ class _loginState extends State<login> {
     }
   }
 
+  bool isChecked = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,9 +40,16 @@ class _loginState extends State<login> {
                 children: [
                   TextFormField(
                     decoration: InputDecoration(
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 20.0, vertical: 0),
                       labelText: 'ID',
+                      labelStyle: const TextStyle(
+                        fontSize: 15.0,
+                        color: Color.fromARGB(112, 40, 51, 74),
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(50.0),
+                        borderSide: BorderSide.none,
                       ),
                       filled: true,
                       fillColor: Color.fromRGBO(218, 122, 55, 0.27),
@@ -56,17 +65,24 @@ class _loginState extends State<login> {
                       _username = value!;
                     },
                   ),
-                  SizedBox(height: 16.0),
+                  const SizedBox(height: 16.0),
                   TextFormField(
                     obscureText: true,
                     decoration: InputDecoration(
                       labelText: 'Contraseña',
+                      labelStyle: const TextStyle(
+                        fontSize: 15.0,
+                        color: Color.fromARGB(112, 40, 51, 74),
+                      ),
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 20.0, vertical: 0),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(50.0),
+                        borderSide: BorderSide.none,
                       ),
                       filled: true,
                       fillColor: Color.fromRGBO(218, 122, 55, 0.27),
-                      hintText: 'Password',
+                      hintText: 'Constraseña',
                     ),
                     validator: (value) {
                       if (value!.isEmpty) {
@@ -78,17 +94,75 @@ class _loginState extends State<login> {
                       _password = value!;
                     },
                   ),
-                  SizedBox(
-                    height: 24.0,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          TextButton(
+                            onPressed: _login,
+                            style: TextButton.styleFrom(
+                              foregroundColor:
+                                  const Color.fromARGB(255, 119, 108, 108),
+                              padding: const EdgeInsets.only(
+                                  left: 10, right: 10, top: 10),
+                              minimumSize: Size.zero,
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            ),
+                            child: const Text("¿Olvidaste tu contraseña?"),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Transform.scale(
+                            scale:
+                                0.8, // Adjust the scale factor to suit your needs
+                            child: Checkbox(
+                              value: isChecked,
+                              onChanged: (bool? value) {
+                                setState(() {
+                                  isChecked = value!;
+                                });
+                              },
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: _login,
+                            style: TextButton.styleFrom(
+                              foregroundColor:
+                                  const Color.fromARGB(255, 119, 108, 108),
+                              padding: EdgeInsets.zero,
+                              minimumSize: Size.zero,
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            ),
+                            child: Text("Mantener la sesión iniciada"),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                  ElevatedButton(
+                  FilledButton(
                     onPressed: _login,
-                    child: Text('Iniciar Sesión'),
+                    child: const Text('Iniciar sesión'),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: Color.fromARGB(217, 218, 123, 55),
+                      minimumSize: Size(double.infinity, 40),
+                    ),
                   ),
-                  SizedBox(height: 16.0),
-                  ElevatedButton(
-                    onPressed: _login,
-                    child: Text('Iniciar sesion como invitado'),
+                  Row(
+                    children: [
+                      TextButton(
+                        onPressed: _login,
+                        child: Text("Iniciar sesión como invitado"),
+                        style: TextButton.styleFrom(
+                          foregroundColor:
+                              const Color.fromARGB(217, 218, 123, 55),
+                          padding: EdgeInsets.zero,
+                          minimumSize: Size.zero,
+                        ),
+                      ),
+                    ],
                   )
                 ],
               ),
