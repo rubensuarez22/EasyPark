@@ -1,4 +1,5 @@
 import 'package:easypark/pages/PreguntasFrecuentes.dart';
+import 'package:easypark/pages/VistaPrincipal.dart';
 import 'package:flutter/material.dart';
 
 class login extends StatefulWidget {
@@ -23,7 +24,7 @@ class _loginState extends State<login> {
     }*/
     Navigator.push(
     context,
-    MaterialPageRoute(builder: (context) => FaqPage()),);
+    MaterialPageRoute(builder: (context) => Principal()),);
   }
 
   bool isChecked = false;
