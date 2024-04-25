@@ -1,3 +1,5 @@
+import 'package:easypark/pages/notifications.dart';
+import 'package:easypark/pages/PreguntasFrecuentes.dart';
 import 'package:easypark/pages/login.dart';
 import 'package:easypark/pages/sugerencias.dart';
 import 'package:flutter/material.dart';
@@ -18,3 +20,4 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
