@@ -1,4 +1,5 @@
 import 'package:easypark/pages/login.dart';
+import 'package:easypark/pages/sugerencias.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -13,8 +14,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(fontFamily: 'Alatsi'),
-      home: login(),
-      
-      );
+      home: SugerenciasView(),
+    );
   }
 }
