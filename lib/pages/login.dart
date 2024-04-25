@@ -1,3 +1,4 @@
+import 'package:easypark/pages/PreguntasFrecuentes.dart';
 import 'package:flutter/material.dart';
 
 class login extends StatefulWidget {
@@ -15,11 +16,14 @@ class _loginState extends State<login> {
 
   void _login() {
     // Implement your login logic here
-    if (_formKey.currentState!.validate()) {
+    /*if (_formKey.currentState!.validate()) {
       // Perform login with _username and _password
       print('Username: $_username');
       print('Password: $_password');
-    }
+    }*/
+    Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => FaqPage()),);
   }
 
   bool isChecked = false;
