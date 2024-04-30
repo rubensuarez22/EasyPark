@@ -4,21 +4,17 @@ class Parked extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true, // Centra el título en la AppBar
-        title: Text(
-          'Parked',
-          style: TextStyle(
-            fontSize: 40.0,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-       body: Center(
+    return Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              const Text(
+                'Parked',
+                style: TextStyle(
+                  fontSize: 40.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               Container(
               margin: EdgeInsets.only(bottom: 50), // Espacio entre la imagen y el botón
               child: Image.asset('assets/images/ParkedImageNBG.png', // Ruta de la imagen
@@ -48,7 +44,6 @@ class Parked extends StatelessWidget {
               
             ], // Children
           ), 
-        ), 
     );
   }
 }

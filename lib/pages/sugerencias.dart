@@ -3,23 +3,20 @@ import 'package:flutter/material.dart';
 class SugerenciasView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true, // Centra el título en la AppBar
-        title: Text(
-          'Sugerencias',
-          style: TextStyle(
-            fontSize: 40.0,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-      body: Padding(
+    return Center(
+      child: Padding(
         padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
+            const Text(
+              'Sugerencias',
+              style: TextStyle(
+                fontSize: 40.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const Text(
               'En este espacio se pueden\nescribir sugerencias respecto a\nlos estacionamientos de la\nuniversidad o la aplicación',
               style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.normal),
               textAlign: TextAlign.center,

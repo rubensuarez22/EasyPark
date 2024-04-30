@@ -18,11 +18,9 @@ class Principal extends StatelessWidget {
 class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(''),
-      ),
-      body: Column(
+    return Center(
+      
+      child: Column(
         children: [
           // Encabezado con imagen y botón
           Container(
