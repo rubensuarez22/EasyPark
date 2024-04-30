@@ -1,11 +1,12 @@
+import 'package:easypark/pages/VistaPrincipal.dart';
+import 'package:easypark/pages/mainNavigation.dart';
 import 'package:easypark/pages/notifications.dart';
 import 'package:easypark/pages/PreguntasFrecuentes.dart';
 import 'package:easypark/pages/login.dart';
 import 'package:easypark/pages/parked.dart';
 import 'package:easypark/pages/sugerencias.dart';
-import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:easypark/pages/VistaPrincipal.dart';
+import 'package:flutter/material.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,11 +22,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(fontFamily: 'Alatsi'),
-      home: login(),
+      home: MainNavigation(),
       routes: {
-        '/Principal': (context) =>
-            Principal(), // Asegúrate de que VistaPrincipal es el widget correcto para esta ruta
+        '/mainNavigation': (context) =>
+            MainNavigation(), // Asegúrate de que VistaPrincipal es el widget correcto para esta ruta
       },
     );
   }
 }
+

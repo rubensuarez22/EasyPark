@@ -15,29 +15,39 @@ class FaqPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 255, 255, 255), // Color de fondo naranja
-        title: Text('Preguntas Frecuentes'), // Título "Preguntas Frecuentes"
-        centerTitle: true, // Centra el título en la pantalla
-      ),
-      body: ListView.builder(
-        itemCount: faqs.length,
-        itemBuilder: (context, index) {
-          return Column(
-            children: [
-              FaqTile(
-                question: faqs[index]['question']!,
-                answer: faqs[index]['answer']!,
-              ),
-              Divider(
-                color: Colors.orange, // Color de la línea horizontal naranja
-                thickness: 2.0, // Grosor de la línea horizontal
-              ),
-            ],
-          );
-        },
-      ),
+    return Center(
+      
+      child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start, // Alinea los elementos al principio
+      children: [
+        const Text(
+          'Preguntas frecuentes',
+          style: TextStyle(
+            fontSize: 24.0,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Expanded(
+          child: ListView.builder(
+            itemCount: faqs.length,
+            itemBuilder: (context, index) {
+              return Column(
+                children: [
+                  FaqTile(
+                    question: faqs[index]['question']!,
+                    answer: faqs[index]['answer']!,
+                  ),
+                  Divider(
+                    color: Colors.orange,
+                    thickness: 2.0,
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      ],
+    ),
     );
   }
 }

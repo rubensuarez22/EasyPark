@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class NotificationsPage extends StatelessWidget {
+  
   final List<Map<String, dynamic>> notifications = [
     {
       'notification': 'El estacionamiento E-1 está cerrado',
@@ -22,40 +23,45 @@ class NotificationsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true, // Centra el título en la AppBar
-        title: Text(
+    return Center(
+
+      child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start, // Alinea los elementos al principio
+      children: [
+        const Text(
           'Notificaciones',
           style: TextStyle(
             fontSize: 40.0,
             fontWeight: FontWeight.bold,
           ),
         ),
-      ),
-       body: ListView.builder(
-        itemCount: notifications.length,
-        itemBuilder: (context, index) {
-          return Column(
-            children: [
-              if (index == 0)  // Conditionally add a divider before the first element
-                Divider(
-                  color: Colors.black,
-                  thickness: 1.0,
-                ),
-              NotificationsTile(
-                notification: notifications[index]['notification']!,
-                imagePath:  notifications[index]['imagePath']!,
-                unread: notifications[index]['unread'] as bool, 
-              ),
-              Divider(
-                color: Colors.black, // Color de la línea horizontal naranja
-                thickness: 1.0, // Grosor de la línea horizontal
-              ),
-            ],
-          );
-        },
-      ),
+        Expanded(
+          child: ListView.builder(
+            itemCount: notifications.length,
+            itemBuilder: (context, index) {
+              return Column(
+                children: [
+                  if (index == 0)  // Conditionally add a divider before the first element
+                    Divider(
+                      color: Colors.black,
+                      thickness: 1.0,
+                    ),
+                  NotificationsTile(
+                    notification: notifications[index]['notification']!,
+                    imagePath:  notifications[index]['imagePath']!,
+                    unread: notifications[index]['unread'] as bool, 
+                  ),
+                  Divider(
+                    color: Colors.black,
+                    thickness: 1.0,
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      ],
+    ),
     );
   }
 }
