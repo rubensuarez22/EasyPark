@@ -1,6 +1,7 @@
 import 'package:easypark/pages/PreguntasFrecuentes.dart';
 import 'package:easypark/pages/VistaPrincipal.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class login extends StatefulWidget {
   const login({super.key});
@@ -11,23 +12,53 @@ class login extends StatefulWidget {
 
 class _loginState extends State<login> {
   final _formKey = GlobalKey<FormState>();
-
-  String _username = '';
-  String _password = '';
-
-  void _login() {
-    // Implement your login logic here
-    /*if (_formKey.currentState!.validate()) {
-      // Perform login with _username and _password
-      print('Username: $_username');
-      print('Password: $_password');
-    }*/
-    Navigator.push(
-    context,
-    MaterialPageRoute(builder: (context) => Principal()),);
-  }
+  final TextEditingController _idController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   bool isChecked = false;
+
+  void _login() async {
+    if (_formKey.currentState!.validate()) {
+      final String id = _idController.text.trim();
+      final String password = _passwordController.text.trim();
+
+      if (await _validateCredentials(id, password)) {
+        Navigator.pushReplacementNamed(context, '/Principal');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("ID o contraseña incorrecta"),
+        ));
+      }
+    }
+  }
+
+  Future<bool> _validateCredentials(String id, String password) async {
+    try {
+      final querySnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('id', isEqualTo: id)
+          .where('password', isEqualTo: password)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        return true;
+      }
+    } catch (e) {
+      print("Error al verificar las credenciales: $e");
+    }
+    return false;
+  }
+
+  void createUser(String userId, String password) async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .set({'password': password}).then((_) {
+      print("Usuario creado con éxito.");
+    }).catchError((error) {
+      print("Error creando usuario: $error");
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,6 +75,7 @@ class _loginState extends State<login> {
               child: Column(
                 children: [
                   TextFormField(
+                    controller: _idController,
                     decoration: InputDecoration(
                       contentPadding: const EdgeInsets.symmetric(
                           horizontal: 20.0, vertical: 0),
@@ -66,12 +98,10 @@ class _loginState extends State<login> {
                       }
                       return null;
                     },
-                    onSaved: (value) {
-                      _username = value!;
-                    },
                   ),
                   const SizedBox(height: 16.0),
                   TextFormField(
+                    controller: _passwordController,
                     obscureText: true,
                     decoration: InputDecoration(
                       labelText: 'Contraseña',
@@ -94,9 +124,6 @@ class _loginState extends State<login> {
                         return 'Por favor ingrese su contraseña';
                       }
                       return null;
-                    },
-                    onSaved: (value) {
-                      _password = value!;
                     },
                   ),
                   Column(
