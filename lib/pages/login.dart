@@ -1,5 +1,3 @@
-import 'package:easypark/pages/PreguntasFrecuentes.dart';
-import 'package:easypark/pages/VistaPrincipal.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -23,7 +21,7 @@ class _loginState extends State<login> {
       final String password = _passwordController.text.trim();
 
       if (await _validateCredentials(id, password)) {
-        Navigator.pushReplacementNamed(context, '/Principal');
+        Navigator.pushReplacementNamed(context, '/mainNavigation');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text("ID o contraseña incorrecta"),
