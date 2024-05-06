@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "940531144370",
+    "project_id": "easypark-a97ba",
+    "storage_bucket": "easypark-a97ba.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:940531144370:android:a777c623d8605a46d49bab",
+        "android_client_info": {
+          "package_name": "com.example.easypark"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDur2UDBufgL4e-jjXh18xPRehHlU-Y27s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
