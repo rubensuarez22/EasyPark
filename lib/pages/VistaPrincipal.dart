@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:easypark/pages/parked.dart';
+import 'package:easypark/pages/parked.dart'; // Ensure this file contains a Parked widget
 
 class Principal extends StatelessWidget {
   @override
@@ -15,73 +15,91 @@ class Principal extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  String? selectedDestination;
+  String? selectedVehicleType;
+
+  void navigateToParked() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) =>
+              Parked()), // Assuming Parked() is your target widget
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        children: [
-          // Encabezado con imagen y botón
-          Container(
-            padding: EdgeInsets.all(16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Imagen del lado izquierdo
-                Image.asset('assets/images/udlap_logo.png',
-                    width: 75, height: 75),
-                // Botón del lado derecho
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushReplacementNamed(context, '/parked');
-                  },
-                  child: Text('Llegué'),
-                ),
-              ],
+    return Scaffold(
+      body: Center(
+        child: Column(
+          children: [
+            Container(
+              padding: EdgeInsets.only(top: 40.0, left: 18.0, right: 18.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Image.asset('assets/images/udlap_logo.png',
+                      width: 75, height: 75),
+                  ElevatedButton(
+                    onPressed: navigateToParked,
+                    child: Text('Llegué'),
+                  ),
+                ],
+              ),
             ),
-          ),
-          // Lista desplegable 1
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.0),
-            child: DropdownButton<String>(
-              isExpanded: true,
-              hint: Text('Escoge tu destino'),
-              onChanged: (String? newValue) {
-                // Acción al seleccionar un elemento de la lista desplegable
-              },
-              items: <String>[
-                'Ingenierías',
-                'Humanidades',
-                'Salud',
-                'Ciencias Sociales',
-                'Negocios',
-                'Gimnasio'
-              ].map((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.0),
+              child: DropdownButton<String>(
+                value: selectedDestination, // Bind the selected value
+                isExpanded: true,
+                hint: Text('Escoge tu destino'),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    selectedDestination = newValue;
+                  });
+                },
+                items: <String>[
+                  'Ingenierías',
+                  'Humanidades',
+                  'Salud',
+                  'Ciencias Sociales',
+                  'Negocios',
+                  'Gimnasio'
+                ].map((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+              ),
             ),
-          ),
-          // Lista desplegable 2
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.0),
-            child: DropdownButton<String>(
-              isExpanded: true,
-              hint: Text('Escoge tu tipo de vehículo'),
-              onChanged: (String? newValue) {
-                // Acción al seleccionar un elemento de la lista desplegable
-              },
-              items: <String>['Carro', 'Moto'].map((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.0),
+              child: DropdownButton<String>(
+                value: selectedVehicleType, // Bind the selected value
+                isExpanded: true,
+                hint: Text('Escoge tu tipo de vehículo'),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    selectedVehicleType = newValue;
+                  });
+                },
+                items: <String>['Carro', 'Moto'].map((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
