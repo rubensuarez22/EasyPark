@@ -1,3 +1,4 @@
+import 'package:easypark/pages/VistaPrincipal.dart';
 import 'package:easypark/pages/mainNavigation.dart';
 import 'package:easypark/pages/login.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -17,10 +18,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(fontFamily: 'Alatsi'),
-      home: login(),
+      home: const login(),
       routes: {
         '/mainNavigation': (context) =>
-            MainNavigation(), // Asegúrate de que VistaPrincipal es el widget correcto para esta ruta
+            const MainNavigation(), // Asegúrate de que VistaPrincipal es el widget correcto para esta ruta
       },
     );
   }
