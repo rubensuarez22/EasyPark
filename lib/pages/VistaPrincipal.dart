@@ -4,6 +4,11 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:async';
 import 'package:easypark/models/location_data.dart';
 import 'dart:math';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+
+//import 'package:geolocator/geolocator.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -17,52 +22,155 @@ class _MyHomePageState extends State<MyHomePage> {
   final Completer<GoogleMapController> _controller = Completer();
   Map<MarkerId, Marker> gMapMarkers = {};
   Marker? destinationMarker;
+  PolylinePoints polylinePoints = PolylinePoints();
+  List<LatLng> polylineCoordinates = [];
+  Map<PolylineId, Polyline> polylines = {};
 
   // Función para manejar la selección del destino
-  void handleDestinationSelection(String? destinationName) {
-    if (destinationName != null) {
-      // Buscar las coordenadas del destino seleccionado
-      LocationData? selectedLocation = destinations.firstWhere(
-        (location) => location.name == destinationName,
-        orElse: () {
-          // Handle the case where no matching location is found
-          // You can return a default LocationData instance or take appropriate action
-          return LocationData(
-            id: 'default',
-            name: 'Default Location',
-            coordinates: LatLng(0.0, 0.0),
-            type: LocationType.destination,
+void handleDestinationSelection(String? destinationName) async {
+  requestLocationPermission();
+  if (destinationName != null) {
+    LocationData? selectedLocation = destinations.firstWhere(
+      (location) => location.name == destinationName,
+      orElse: () {
+        return LocationData(
+          id: 'default',
+          name: 'Default Location',
+          coordinates: LatLng(0.0, 0.0),
+          type: LocationType.destination,
+        );
+      },
+    );
+
+    if (selectedLocation != null) {
+      LocationData? nearestParking =
+          findNearestParking(selectedLocation.coordinates);
+
+      if (nearestParking != null) {
+        setState(() {
+          gMapMarkers = {};
+          gMapMarkers[MarkerId(selectedLocation.id)] = Marker(
+            markerId: MarkerId(selectedLocation.id),
+            position: selectedLocation.coordinates,
+            icon: BitmapDescriptor.defaultMarkerWithHue(
+                BitmapDescriptor.hueGreen),
+            infoWindow: InfoWindow(title: selectedLocation.name),
           );
-        },
-      );
 
-      if (selectedLocation != null) {
-        // Encontrar el estacionamiento más cercano al destino seleccionado
-        LocationData? nearestParking =
-            findNearestParking(selectedLocation.coordinates);
+          _addNearestParkingMarker(nearestParking.coordinates);
 
-        if (nearestParking != null) {
-          // Actualizar los marcadores en el mapa
-          setState(() {
-            // Limpiar todos los marcadores existentes
-            gMapMarkers = {};
-
-            // Añadir marcador del destino seleccionado
-            gMapMarkers[MarkerId(selectedLocation.id)] = Marker(
-              markerId: MarkerId(selectedLocation.id),
-              position: selectedLocation.coordinates,
-              icon: BitmapDescriptor.defaultMarkerWithHue(
-                  BitmapDescriptor.hueGreen),
-              infoWindow: InfoWindow(title: selectedLocation.name),
-            );
-
-            // Añadir marcador del estacionamiento más cercano
-            _addNearestParkingMarker(nearestParking.coordinates);
-          });
-        }
+          // Llama a la función para obtener la ruta
+         
+          _getRoute(nearestParking.coordinates);
+        });
       }
     }
   }
+}
+
+
+
+  //FUNCIONES PARA HACER LA RUTA DE LA UBICACION AL ESTACIONAMIENTO
+  //Funcion para solicitar permisos de la ubicacion del usuario
+
+  //Variables
+  //PolylinePoints polylinePoints = PolylinePoints();
+  //List<LatLng> polylineCoordinates = [];
+  //Map<PolylineId, Polyline> polylines = {};
+
+  Future<void> requestLocationPermission() async {
+    if (await Permission.location.request().isGranted) {
+      // Permiso concedido, puedes realizar acciones relacionadas con la ubicación
+      print("permiso");
+    } else {
+      // Permiso denegado, muestra un mensaje o toma otra acción según sea necesario
+      print('Permiso de ubicación denegado.');
+    }
+  }
+
+
+  //Obtener la ubicacion actual
+  Future<Position?> getCurrentLocation() async {
+  try {
+    // Solicitar permisos de ubicación si no están concedidos
+    LocationPermission permission = await Geolocator.requestPermission();
+   
+
+
+    if (permission == LocationPermission.denied) {
+      // Handle case where permission is denied
+      print("No aceptado");
+      return null;
+    }
+
+    Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+    return position;
+  } catch (e) {
+    print("Error obteniendo ubicación: $e");
+    return null;
+  }
+}
+
+
+//Utilizar funcion para obtener la ubicacion actual
+/*
+Future<void> _obtenerUbicacion() async {
+  Position? position = await getCurrentLocation();
+  if (position != null) {
+    print("Ubicación actual: ${position.latitude}, ${position.longitude}");
+    // Aquí puedes usar la ubicación obtenida según tus necesidades
+  } else {
+    print("No se pudo obtener la ubicación actual");
+    // Manejar el caso en el que no se pueda obtener la ubicación
+  }
+}
+*/
+//Obtener la ruta
+void _getRoute(LatLng destination) async {
+  LatLng coordenadasExample = LatLng(19.050183, -98.284414);
+  Position? currentPosition = await getCurrentLocation();
+  if (currentPosition != null) {
+    PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+      'AIzaSyC511vzkC1QCs2wVGdoEjadSBXaSfp7uGw', // Tu clave API de Google Maps
+      //PointLatLng(currentPosition.latitude, currentPosition.longitude),
+      PointLatLng(coordenadasExample.latitude, coordenadasExample.longitude),
+      PointLatLng(destination.latitude, destination.longitude),
+    );
+
+    if (result.points.isNotEmpty) {
+      List<LatLng> polylineCoordinates = [];
+      result.points.forEach((PointLatLng point) {
+        polylineCoordinates.add(LatLng(point.latitude, point.longitude));
+      });
+
+      setState(() {
+        PolylineId id = PolylineId('route');
+        Polyline polyline = Polyline(
+          polylineId: id,
+          color: Colors.blue,
+          points: polylineCoordinates,
+          width: 3,
+        );
+        polylines[id] = polyline; // Agregar la polyline al mapa
+      });
+    }
+  } else {
+    // Manejar el caso en el que no se pudo obtener la ubicación actual
+    print("No se pudo obtener la ubicación actual para calcular la ruta");
+  }
+}
+
+
+
+
+
+
+
+
+
+
 
   // Función para añadir marcador del estacionamiento más cercano
   void _addNearestParkingMarker(LatLng parkingCoordinates) {
@@ -127,6 +235,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    
+
     return Scaffold(
       body: Center(
         child: Column(
@@ -140,6 +250,8 @@ class _MyHomePageState extends State<MyHomePage> {
               padding: EdgeInsets.symmetric(horizontal: 16.0),
               child: _dropDownButtonTypeOfVehicle(),
             ),
+
+
             Expanded(
               child: GoogleMap(
                 mapType: MapType.terrain,
@@ -147,9 +259,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 onMapCreated: (GoogleMapController controller) {
                   _controller.complete(controller);
                 },
-                markers: Set<Marker>.of(gMapMarkers
-                    .values), // Asegúrate de usar el mapa actualizado de marcadores aquí
+                markers: Set<Marker>.of(gMapMarkers.values), // Asegúrate de usar el mapa actualizado de marcadores aquí
+                polylines: Set<Polyline>.of(polylines.values)
               ),
+
+
             ),
           ],
         ),
