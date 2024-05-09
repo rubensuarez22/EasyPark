@@ -131,13 +131,15 @@ Future<void> _obtenerUbicacion() async {
 void _getRoute(LatLng destination) async {
   LatLng coordenadasExample = LatLng(19.050183, -98.284414);
   Position? currentPosition = await getCurrentLocation();
+  
   if (currentPosition != null) {
     PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
       'AIzaSyC511vzkC1QCs2wVGdoEjadSBXaSfp7uGw', // Tu clave API de Google Maps
-      //PointLatLng(currentPosition.latitude, currentPosition.longitude),
-      PointLatLng(coordenadasExample.latitude, coordenadasExample.longitude),
+      PointLatLng(currentPosition.latitude, currentPosition.longitude),
+      //PointLatLng(coordenadasExample.latitude, coordenadasExample.longitude),
       PointLatLng(destination.latitude, destination.longitude),
     );
+    
 
     if (result.points.isNotEmpty) {
       List<LatLng> polylineCoordinates = [];
@@ -154,6 +156,15 @@ void _getRoute(LatLng destination) async {
           width: 3,
         );
         polylines[id] = polyline; // Agregar la polyline al mapa
+
+        Marker currentPositionMarker = Marker(
+          markerId: MarkerId('currentPosition'),
+          position: LatLng(currentPosition.latitude, currentPosition.longitude),
+          //position: coordenadasExample,
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+          infoWindow: InfoWindow(title: 'Ubicación actual'),
+        );
+         gMapMarkers[MarkerId('currentPosition')] = currentPositionMarker;
       });
     }
   } else {
