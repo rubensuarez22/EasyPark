@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
+import 'package:easypark/main.dart';
 
 class login extends StatefulWidget {
   const login({super.key});
@@ -21,6 +23,7 @@ class _loginState extends State<login> {
       final String password = _passwordController.text.trim();
 
       if (await _validateCredentials(id, password)) {
+        Provider.of<UserIdProvider>(context, listen: false).setUserId(id);
         Navigator.pushReplacementNamed(context, '/mainNavigation');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -226,3 +229,6 @@ class _loginState extends State<login> {
     );
   }
 }
+
+
+

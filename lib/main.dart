@@ -3,26 +3,38 @@ import 'package:easypark/pages/mainNavigation.dart';
 import 'package:easypark/pages/login.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+//import 'package:easypark/providers/user_id_provider.dart'; // Importa la clase UserIdProvider
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(fontFamily: 'Alatsi'),
-      home: const login(),
-      routes: {
-        '/mainNavigation': (context) =>
-            const MainNavigation(), // Asegúrate de que VistaPrincipal es el widget correcto para esta ruta
-      },
+    return ChangeNotifierProvider( // Envuelve MaterialApp con ChangeNotifierProvider
+      create: (context) => UserIdProvider(), // Crea una instancia de UserIdProvider
+      child: MaterialApp(
+        theme: ThemeData(fontFamily: 'Alatsi'),
+        home: const login(),
+        routes: {
+          '/mainNavigation': (context) => const MainNavigation(),
+        },
+      ),
     );
+  }
+}
+
+class UserIdProvider extends ChangeNotifier {
+  String? _userId;
+
+  String? get userId => _userId;
+
+  void setUserId(String? userId) {
+    _userId = userId;
+    notifyListeners();
   }
 }
