@@ -10,12 +10,17 @@ class LocationData {
   final String name;
   final LatLng coordinates;
   final LocationType type;
+  final int? totalSpots;
+  final int? availableSpots;
 
   LocationData(
       {required this.id,
       required this.name,
       required this.coordinates,
-      required this.type});
+      required this.type,
+      this.totalSpots,
+      this.availableSpots,
+      });
 }
 
 // Lista de destinos
@@ -23,7 +28,7 @@ final List<LocationData> destinations = [
   LocationData(
       id: "1",
       name: "Ingenierías",
-      coordinates: LatLng(19.054045953267238, -98.28195441617939),
+      coordinates: LatLng(19.054045953267238, -98.28195441617939), 
       type: LocationType.destination),
   LocationData(
       id: "2",
@@ -68,12 +73,18 @@ final List<LocationData> parkingSpots = [
       id: "1",
       name: "Estacionamiento 1",
       coordinates: LatLng(19.055490356082654, -98.28252611343008),
-      type: LocationType.parking),
+      type: LocationType.parking,
+      totalSpots: 50,
+      availableSpots: 14
+      ),
   LocationData(
       id: "2",
       name: "Estacionamiento 2",
       coordinates: LatLng(19.054964368672263, -98.28149381520501),
-      type: LocationType.parking),
+      type: LocationType.parking,
+      totalSpots: 207,
+      availableSpots: 0
+      ),
 
   LocationData(
       id: "3",
@@ -85,19 +96,29 @@ final List<LocationData> parkingSpots = [
       id: "4",
       name: "Estacionamiento 4",
       coordinates: LatLng(19.051962586515412, -98.28194588045986),
-      type: LocationType.parking),
+      type: LocationType.parking,
+      totalSpots: 156,
+      availableSpots: 17
+      ),
 
   LocationData(
       id: "5",
       name: "Estacionamiento 5",
       coordinates: LatLng(19.052761198488138, -98.28443159502199),
-      type: LocationType.parking),
+      type: LocationType.parking,
+      totalSpots: 188,
+      availableSpots: 20
+      
+      ),
 
   LocationData(
       id: "6",
       name: "Estacionamiento 6",
       coordinates: LatLng(19.052563189675755, -98.28532614439902),
-      type: LocationType.parking),
+      type: LocationType.parking,
+      totalSpots: 156,
+      availableSpots: 13
+      ),
 
   LocationData(
       id: "7",
@@ -109,6 +130,10 @@ final List<LocationData> parkingSpots = [
       id: "8",
       name: "Estacionamiento 8",
       coordinates: LatLng(19.055250143463734, -98.2838512983873),
-      type: LocationType.parking),
+      type: LocationType.parking,
+      totalSpots: 60,
+      availableSpots: 8
+      ),
   // Más estacionamientos...
 ];
+
