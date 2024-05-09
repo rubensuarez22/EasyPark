@@ -4,6 +4,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:async';
 import 'package:easypark/models/location_data.dart';
 import 'dart:math';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -57,7 +58,7 @@ void handleDestinationSelection(String? destinationName) async {
             infoWindow: InfoWindow(title: selectedLocation.name),
           );
 
-          _addNearestParkingMarker(nearestParking.coordinates);
+          _addNearestParkingMarker(nearestParking);
 
           // Llama a la función para obtener la ruta
          
@@ -184,13 +185,27 @@ void _getRoute(LatLng destination) async {
 
 
   // Función para añadir marcador del estacionamiento más cercano
-  void _addNearestParkingMarker(LatLng parkingCoordinates) {
-    Marker nearestParkingMarker = Marker(
-      markerId: MarkerId('nearestParking'),
-      position: parkingCoordinates,
-      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-      infoWindow: InfoWindow(title: 'Estacionamiento más cercano'),
-    );
+  void _addNearestParkingMarker(LocationData nearestParking) async {
+    // Obtiene el documento del estacionamiento más cercano desde Firestore
+    updateAvailableSpots();
+  final parkingSnapshot = await FirebaseFirestore.instance.collection("ParkingLots").doc(selectedDestination).get();
+  
+  // Obtiene el número de lugares disponibles del documento
+  int? availableSpots = parkingSnapshot.data()?["Lugares Disponibles"];
+  
+  // Crea el texto para mostrar en el marcador
+  String spotsText = availableSpots != null ? 'Lugares disponibles: $availableSpots' : 'Lugares disponibles: No disponible';
+
+  // Crea el marcador con la información actualizada
+  Marker nearestParkingMarker = Marker(
+    markerId: MarkerId('nearestParking'),
+    position: nearestParking.coordinates,
+    icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+    infoWindow: InfoWindow(
+      title: 'Estacionamiento más cercano',
+      snippet: spotsText,
+    ),
+  );
 
     // Añadir marcador del estacionamiento más cercano al mapa
     gMapMarkers[MarkerId('nearestParking')] = nearestParkingMarker;
@@ -201,7 +216,7 @@ void _getRoute(LatLng destination) async {
       context,
       MaterialPageRoute(
           builder: (context) =>
-              Parked()), // Assuming Parked() is your target widget
+              Parked(unlockFunction: unlockFirstOccupiedSpot,)), // Assuming Parked() is your target widget
     );
   }
 
@@ -229,15 +244,17 @@ void _getRoute(LatLng destination) async {
     double closestDistance = double.infinity;
 
     for (LocationData parking in parkingSpots) {
-      double distance = calculateDistance(
+      if(parking.availableSpots != null && parking.availableSpots! > 0){
+        double distance = calculateDistance(
         destination.latitude,
         destination.longitude,
         parking.coordinates.latitude,
         parking.coordinates.longitude,
-      );
-      if (distance < closestDistance) {
-        closestDistance = distance;
-        nearestParking = parking;
+        );
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          nearestParking = parking;
+        }
       }
     }
 
@@ -329,11 +346,97 @@ void _getRoute(LatLng destination) async {
         children: [
           Image.asset('assets/images/udlap_logo.png', width: 75, height: 75),
           ElevatedButton(
-            onPressed: navigateToParked,
+            onPressed: () {
+              
+              updateFirstAvailableSpot();
+              navigateToParked();
+              
+
+            },
             child: Text('Llegué'),
+            
           ),
         ],
       ),
     );
   }
+
+  Future<void> updateFirstAvailableSpot() async 
+  {
+  try {
+    // Obtiene el estacionamiento seleccionado
+    final parkingSnapshot = await FirebaseFirestore.instance.collection("ParkingLots").doc(selectedDestination).get();
+
+    // Obtiene el array de disponibilidad del estacionamiento
+    List<bool> availabilityArray = parkingSnapshot.data()?["Disponible"].cast<bool>();
+
+    // Itera sobre el array de disponibilidad
+    int availableSpotIndex = availabilityArray.indexOf(true);
+    if (availableSpotIndex != -1) {
+      // Actualiza la disponibilidad del cajón
+      availabilityArray[availableSpotIndex] = false;
+
+      // Actualiza el documento en Firestore
+      await FirebaseFirestore.instance.collection("ParkingLots").doc(selectedDestination).update({
+        "Disponible": availabilityArray,
+      });
+
+      print("Disponibilidad del cajón actualizada correctamente.");
+      updateAvailableSpots();
+    } else {
+      print("No se encontraron cajones disponibles en este estacionamiento.");
+    }
+  } catch (e) {
+    print("Error al actualizar la disponibilidad del cajón: $e");
+  }
+  }
+
+  Future<void> unlockFirstOccupiedSpot() async {
+  try {
+    // Obtiene el estacionamiento seleccionado
+    final parkingSnapshot = await FirebaseFirestore.instance.collection("ParkingLots").doc(selectedDestination).get();
+
+    // Obtiene el array de disponibilidad del estacionamiento
+    List<bool> availabilityArray = parkingSnapshot.data()?["Disponible"].cast<bool>();
+
+    // Itera sobre el array de disponibilidad
+    int occupiedSpotIndex = availabilityArray.indexOf(false);
+    if (occupiedSpotIndex != -1) {
+      // Desbloquea la disponibilidad del cajón
+      availabilityArray[occupiedSpotIndex] = true;
+
+      // Actualiza el documento en Firestore
+      await FirebaseFirestore.instance.collection("ParkingLots").doc(selectedDestination).update({
+        "Disponible": availabilityArray,
+      });
+
+      print("Desbloqueo del cajón exitoso.");
+      updateAvailableSpots();
+    } else {
+      print("No se encontraron cajones ocupados en este estacionamiento.");
+    }
+  } catch (e) {
+    print("Error al desbloquear el cajón: $e");
+  }
+  }
+
+  void updateAvailableSpots() async {
+  // Realiza una consulta a Firestore para obtener el documento del estacionamiento
+  final parkingSpotSnapshot = await FirebaseFirestore.instance.collection("ParkingLots").doc(selectedDestination).get();
+  
+  // Obtiene el array de disponibilidad del estacionamiento desde Firestore
+  List<bool> availabilityArray = List<bool>.from(parkingSpotSnapshot.data()?["Disponible"] ?? []);
+  
+  // Cuenta el número de lugares disponibles (True) en el array
+  int availableSpots = availabilityArray.where((element) => element).length;
+
+  // Actualiza el campo "available_spots" en Firestore con el nuevo valor
+  await FirebaseFirestore.instance.collection("ParkingLots").doc(selectedDestination).update({
+    "Lugares Disponibles": availableSpots,
+  });
+
+  print("Lugares disponibles actualizados correctamente: $availableSpots");
 }
+
+}
+

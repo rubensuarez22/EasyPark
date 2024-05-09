@@ -1,6 +1,16 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
+import 'package:easypark/pages/VistaPrincipal.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+typedef UnlockFunction = Future<void> Function();
 
 class Parked extends StatelessWidget {
+
+  final UnlockFunction unlockFunction;
+  
+  Parked({required this.unlockFunction});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,8 +37,10 @@ class Parked extends StatelessWidget {
               margin: EdgeInsets.only(bottom: 100),
               height: 50, // Altura del botón
               child: ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   // Navigate back to the previous page
+                  
+                  await unlockFunction();
                   Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
@@ -48,5 +60,7 @@ class Parked extends StatelessWidget {
         ),
       ),
     );
+    
   }
+  
 }
